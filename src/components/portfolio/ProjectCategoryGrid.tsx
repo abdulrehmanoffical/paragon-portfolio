@@ -185,12 +185,12 @@ const featuredCategories: FeaturedCategory[] = [
 
 export default function ProjectCategoryGrid() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-7 lg:gap-10">
       {featuredCategories.map((category) => (
         <Link
           key={category.id}
           href={category.href}
-          className="group block rounded-2xl bg-surface border border-border p-3 sm:p-4 transition-all duration-300 hover:border-strong/40 hover:shadow-md hover:shadow-black/5"
+          className="group block rounded-2xl bg-surface border border-border p-3 sm:p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-strong/40 hover:shadow-md hover:shadow-black/5"
         >
           {/* Dominant Visual Thumbnail */}
           <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden mb-4 border border-border bg-ink transition-transform duration-300 group-hover:scale-[1.01]">

@@ -93,9 +93,12 @@ export default function Home() {
       */}
       <section
         ref={introSectionRef}
-        className="w-full pt-32 sm:pt-40 md:pt-44 pb-14 md:pb-20 px-4 sm:px-6 lg:px-8 border-b border-border"
+        className="w-full pt-32 sm:pt-40 md:pt-44 pb-16 md:pb-24 px-4 sm:px-6 lg:px-8 border-b border-border"
       >
         <div className="max-w-3xl mx-auto text-left">
+          {/* Compositional accent — a plain rule, not copy, giving the
+              headline a deliberate anchor rather than starting cold */}
+          <div className="w-12 h-px bg-border mb-6" aria-hidden="true" />
           <h1
             ref={headlineRef}
             className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-strong leading-[1.15] mb-5 text-balance uppercase"

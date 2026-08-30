@@ -249,12 +249,14 @@ export default function VideoCarousel({
             onTouchEnd={onTouchEndHandler}
             className="relative flex-1 min-w-0 overflow-hidden py-2 focus:outline-none select-none"
           >
-            {/* w-fit + mx-auto so this row shrink-wraps to the visible card
-                cluster instead of spanning the full track width — the
-                incoming-item overlay below anchors to this row's true edge,
-                which only matches the visible cards' edge when it isn't
-                stretched wider than its content. */}
-            <div className="relative flex items-center justify-center gap-3 sm:gap-6 md:gap-8 w-fit mx-auto">
+            {/* w-full: the child cards are sized with percentage widths
+                (w-[92%], w-[21%], ...), and percentages only resolve
+                against a *definite* containing-block width — a shrink-to-fit
+                row (w-fit) has no definite width for them to resolve
+                against, so they collapsed to near-zero. w-full gives them
+                containerRef's real, definite flex-1 width to resolve
+                against instead. */}
+            <div className="relative flex items-center justify-center gap-3 sm:gap-6 md:gap-8 w-full">
               {/* LEFT ITEM (Small side preview) */}
               {hasMultiple && (
                 <div
@@ -310,25 +312,29 @@ export default function VideoCarousel({
                   <VideoThumbnail project={nextItem} isCenter={false} />
                 </div>
               )}
-
-              {/* INCOMING ITEM (transient — slides in from off-stage to fill
-                  the slot vacated by this rotation; unmounted on complete) */}
-              {incoming && (
-                <div
-                  ref={incomingCardRef}
-                  aria-hidden="true"
-                  className={`hidden sm:block absolute top-1/2 -translate-y-1/2 pointer-events-none ${
-                    incoming.direction === "next" ? "right-0" : "left-0"
-                  } shrink-0 ${
-                    isVertical
-                      ? "w-[19%] max-w-[155px] aspect-[9/16]"
-                      : "w-[21%] max-w-[220px] aspect-[16/9]"
-                  } rounded-xl overflow-hidden border border-border shadow-sm`}
-                >
-                  <VideoThumbnail project={incoming.item} isCenter={false} />
-                </div>
-              )}
             </div>
+
+            {/* INCOMING ITEM (transient — slides in from off-stage to fill
+                the slot vacated by this rotation; unmounted on complete).
+                Anchored to containerRef (this component's outer, definite-
+                width relative ancestor) rather than the inner row, so its
+                edge is never dependent on the row happening to be the same
+                width — it just always is now that the row is w-full. */}
+            {incoming && (
+              <div
+                ref={incomingCardRef}
+                aria-hidden="true"
+                className={`hidden sm:block absolute top-1/2 -translate-y-1/2 pointer-events-none ${
+                  incoming.direction === "next" ? "right-0" : "left-0"
+                } shrink-0 ${
+                  isVertical
+                    ? "w-[19%] max-w-[155px] aspect-[9/16]"
+                    : "w-[21%] max-w-[220px] aspect-[16/9]"
+                } rounded-xl overflow-hidden border border-border shadow-sm`}
+              >
+                <VideoThumbnail project={incoming.item} isCenter={false} />
+              </div>
+            )}
           </div>
 
           {hasMultiple && (

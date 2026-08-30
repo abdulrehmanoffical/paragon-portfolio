@@ -24,12 +24,15 @@ export const metadata: Metadata = {
   title: "PARAGON | Creative Digital Studio",
   description: "Video, design, and digital work for businesses that value clear, thoughtful execution.",
   icons: {
+    // Cache-busting query string — browsers cache favicons aggressively
+    // across reloads/refreshes. Bump this version on any future favicon
+    // change; the underlying files are unchanged.
     icon: [
-      { url: "/branding/favicon.svg", type: "image/svg+xml" },
-      { url: "/branding/favicon.png", type: "image/png" },
+      { url: "/branding/favicon.svg?v=2", type: "image/svg+xml" },
+      { url: "/branding/favicon.png?v=2", type: "image/png" },
     ],
-    shortcut: "/branding/favicon.png",
-    apple: "/branding/favicon.png",
+    shortcut: "/branding/favicon.png?v=2",
+    apple: "/branding/favicon.png?v=2",
   },
 };
 

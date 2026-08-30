@@ -6,14 +6,21 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* Paragon color system — role-based tokens that flip per theme via
-   [data-theme="dark"] below (kept as live CSS variables by `@theme inline`,
-   so bg-background/text-strong/etc. resolve correctly per theme with no
-   dark: variant needed). `ink`/`ink-surface`/`paper` are fixed, non-flipping
-   tones reused for camera/browser-chrome illustration mockups that must
-   always render as dark UI regardless of site theme — each is one of the
-   six approved Paragon hexes (the dark-mode background/surface/strong
-   values), just held fixed rather than flipping. */
-@theme inline {
+   [data-theme="dark"] below. Deliberately NOT `@theme inline`: inline bakes
+   the resolved literal value straight into each generated utility (e.g.
+   `.bg-background { background-color: #F3F1EC }`), which permanently wins
+   over the [data-theme="dark"] override below since there'd be no
+   var(--color-background) reference left for it to attach to — that was a
+   real, confirmed bug (dark mode only visibly changed the logo, which uses
+   the separate dark: variant-selector mechanism, unrelated to this token
+   system). A plain `@theme` keeps utilities as `var(--color-*)` references,
+   so the runtime override actually takes effect.
+   `ink`/`ink-surface`/`paper` are fixed, non-flipping tones reused for
+   camera/browser-chrome illustration mockups that must always render as
+   dark UI regardless of site theme — each is one of the six approved
+   Paragon hexes (the dark-mode background/surface/strong values), just
+   held fixed rather than flipping. */
+@theme {
   --color-background: #F3F1EC;
   --color-surface: #E8E5DE;
   --color-border: #D2CEC5;
@@ -24,7 +31,13 @@
   --color-ink: #0E0F0F;
   --color-ink-surface: #171918;
   --color-paper: #FAF8F2;
+}
 
+/* Font mappings genuinely need `inline`: they reference next/font's
+   dynamically generated CSS variables, which only exist on the specific
+   className'd elements (body), not globally at :root — inline is what lets
+   Tailwind resolve that reference correctly. */
+@theme inline {
   --font-sans: var(--font-source-sans);
   --font-display: var(--font-playfair);
 }
