@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+/* Explicit toggle-driven dark mode (Tailwind v4 CSS-first config) —
+   data-theme is set on <html> by the anti-FOUC script in layout.tsx and
+   by ThemeContext on toggle. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Paragon color system — role-based tokens that flip per theme via
+   [data-theme="dark"] below (kept as live CSS variables by `@theme inline`,
+   so bg-background/text-strong/etc. resolve correctly per theme with no
+   dark: variant needed). `ink`/`ink-surface`/`paper` are fixed, non-flipping
+   tones reused for camera/browser-chrome illustration mockups that must
+   always render as dark UI regardless of site theme — each is one of the
+   six approved Paragon hexes (the dark-mode background/surface/strong
+   values), just held fixed rather than flipping. */
+@theme inline {
+  --color-background: #F3F1EC;
+  --color-surface: #E8E5DE;
+  --color-border: #D2CEC5;
+  --color-secondary: #77736B;
+  --color-text: #171717;
+  --color-strong: #0E0E0E;
+
+  --color-ink: #0E0F0F;
+  --color-ink-surface: #171918;
+  --color-paper: #FAF8F2;
+
+  --font-sans: var(--font-source-sans);
+  --font-display: var(--font-playfair);
+}
+
+:root {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --color-background: #0E0F0F;
+  --color-surface: #171918;
+  --color-border: #30312E;
+  --color-secondary: #A5A39C;
+  --color-text: #F1EFE8;
+  --color-strong: #FAF8F2;
+  color-scheme: dark;
+}
+
+@layer base {
+  *, ::before, ::after {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-source-sans), system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-strong);
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+}
