@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { VIDEO_CATEGORIES, VideoProject } from "@/lib/videoEditingData";
-import VideoCarousel from "@/components/video-editing/VideoCarousel";
+import VideoShowcase from "@/components/video-editing/VideoShowcase";
 import VideoLightbox from "@/components/video-editing/VideoLightbox";
 import ServiceTestimonials from "@/components/testimonials/ServiceTestimonials";
 import Footer from "@/components/layout/Footer";
@@ -42,7 +42,7 @@ export default function VideoEditingPortfolioPage() {
       */}
       <main className="w-full flex-1">
         {VIDEO_CATEGORIES.map((category) => (
-          <VideoCarousel
+          <VideoShowcase
             key={category.id}
             categoryTitle={category.title}
             items={category.items}

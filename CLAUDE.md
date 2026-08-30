@@ -40,9 +40,19 @@ No `/portfolio` route system. No `/project/[slug]` or `[service]/[slug]` case-st
 
 Premium, professional, trustworthy, authentic, minimalist, refined, interactive, calm.
 
-Minimalism + restrained glassmorphism. Glass is a supporting treatment, not the main design language — use it selectively for: navbar, dropdowns, controls, theme toggle, selected/elevated surfaces, lightbox UI where appropriate. Do not turn the whole site into glass cards.
+Glass is a first-class structural material, not a restrained accent — see "Glass system" below. A single abstract 3D moment is permitted on Home (see "Motion & 3D system"). Both still answer to the same bar as everything else: premium and intentional, never templated or gimmicky.
 
-Avoid: excessive blur, neon/glowing glass, colorful glass, decorative blobs, generic AI decoration, excessive rounded-card layouts, unnecessary visual effects.
+Avoid: neon/glowing glass, colorful glass, decorative blobs, generic AI decoration, excessive rounded-card layouts, unnecessary visual effects, literal 3D device/product mockups.
+
+## Glass system (locked)
+
+Three tiers, defined once in `src/app/globals.css` via Tailwind v4's `@utility` API (`glass-subtle`, `glass-standard`, `glass-strong`) — built only from the locked palette's `--color-surface` / `--color-border` tokens plus blur/shadow, so Light and Dark stay the same material. `@utility` (not a plain class in `@layer utilities`) is what makes `hover:`/`group-hover:`/`focus-visible:` variants resolve against them.
+
+- `glass-subtle` — `surface` at 60% + 12px blur + 40%-border. Chrome that exists in numbers on screen at once and sits at rest: showcase tiles, the graphic design gallery, the mobile nav drawer.
+- `glass-standard` — `surface` at 45% + 24px blur + 50%-border + soft shadow. Chrome that exists in small numbers at once: the Navbar (always on, not just post-scroll), lightbox headers/footers, showcase tiles on hover.
+- `glass-strong` — `surface` at 35% + 40px blur + 60%-border + stronger shadow. A hero focal panel (currently: the frame around Home's 3D element).
+
+Performance discipline: a grid with many tiles on screen at once uses `-subtle` at rest and steps up to `-standard` only on hover, so at most one or two heavy-blur layers are ever active together — never seven always-on heavy-blur cards. Confirmed by inspecting computed styles directly (screenshots alone don't reliably show a working `backdrop-filter` at these opacities): see the Changelog entry on the Lightning CSS prefix bug this caught.
 
 ## Color system (locked)
 
@@ -71,9 +81,9 @@ Light and Dark, switchable from the Navbar. The selected theme persists between 
 
 ## Cinematic intro
 
-Home begins with a cinematic intro: white screen, centered **black** Paragon logo. Sequence: brief hold → logo fades subtly → the entire intro layer moves upward together → Home is revealed underneath. Target total duration ~1 second. Feel: soft, smooth, premium, cinematic, natural.
+Home begins with a cinematic intro: white screen, centered **black** Paragon logo. Sequence: the logo *arrives* (scale + opacity in, soft decelerate — not static from frame one) → brief hold at full presence → logo settles back slightly while the entire intro layer moves upward together → Home is revealed underneath. Target total duration ~1.1–1.2 seconds. Feel: soft, smooth, premium, cinematic, natural.
 
-No loaders, progress bars, bounce, elastic motion, overshoot, rotation, dramatic scaling, sessionStorage/ESC skipping, or skip buttons. Reduced-motion simplifies the sequence but still plays it — never skips it.
+No loaders, progress bars, bounce, elastic motion, overshoot, rotation, dramatic scaling, sessionStorage/ESC skipping, or skip buttons. Reduced-motion simplifies the sequence (drops the arrival scale, does a plain crossfade) but still plays it — never skips it.
 
 ## Home page
 
@@ -100,10 +110,10 @@ Real overview page presenting the four service categories (Video Editing, GHL, G
 
 Categories, in this exact order: **SaaS Videos, Gaming, YouTube, Reels & Shorts.** Vlogs is removed and must not be recreated.
 
-Carousel structure is locked: `← [ SMALL ] [ LARGE ] [ SMALL ] →`, arrows outside the media, center item dominant. The carousel must physically animate between positions — never a simple fade/swap.
-
-- Right movement: small → center, center → left, new item → right.
-- Left movement is the reverse.
+Showcase structure (`VideoShowcase.tsx`, replacing the old SMALL/LARGE/SMALL carousel): a responsive, content-aware CSS grid, not a rotating/looping mechanism.
+- Exactly 1 item → one large featured tile, no grid.
+- 2+ items → column count depends on the category's aspect ratio: horizontal/16:9 categories (SaaS Videos, Gaming, YouTube) use fewer, wider columns; vertical/9:16 categories (Reels & Shorts) use more, narrower columns.
+- Every tile: real poster image, `glass-subtle` at rest intensifying to `glass-standard` on hover/focus, staggered scroll-triggered entrance (GSAP), click opens the existing `VideoLightbox` unchanged.
 
 **Video thumbnails**: use the first frame of the video as the thumbnail once real videos are supplied — do not require manually created thumbnails unless the user specifically supplies one. Do not invent video descriptions; titles should be concise and professionally derived from actual supplied content. Reels & Shorts items use title only.
 
@@ -184,14 +194,15 @@ Before calling a feature complete: test desktop, tablet, mobile; test Light and 
 
 ## Motion & 3D system
 
-- Shared easing/duration tokens: `src/lib/motion.ts` (`EASE`, `DURATION`) — used by the carousel, both lightboxes, the testimonial crossfade, the theme toggle.
-- Shared scroll-reveal: `src/components/motion/Reveal.tsx` — wraps a block, fades/slides it up on scroll (`top 85%` trigger), self-registers ScrollTrigger, skips the tween under `prefers-reduced-motion`. Used on every page's main content area except Home and About, which already have their own per-section reveals.
+- Shared easing/duration tokens: `src/lib/motion.ts` (`EASE`, `DURATION`) — used by the showcase grid, both lightboxes, the testimonial crossfade, the theme toggle.
+- Shared scroll-reveal: `src/components/motion/Reveal.tsx` — wraps a block, fades/slides it up on scroll (`top 85%` trigger), self-registers ScrollTrigger, skips the tween under `prefers-reduced-motion`. Used on every page's main content area except Home and About (their own per-section reveals) and the video/graphic-design grids (their own per-tile stagger, below).
 - Route-level fade: `src/components/motion/RouteTransition.tsx`, wrapping `{children}` in `src/app/layout.tsx` — a soft entrance for the incoming page on navigation instead of a hard cut. Not a true old/new crossfade (that needs the View Transitions API); skips on first paint and under reduced motion.
-- Cinematic intro: `src/components/motion/CinematicIntro.tsx` — see "Cinematic intro" above, unchanged.
-- Video Editing carousel: `src/components/video-editing/VideoCarousel.tsx` — physical SMALL/LARGE/SMALL rotation via GSAP. Degrades for a 1-item category (no arrows/side previews) and a 2-item category (shows the one real neighbor once, on the side it belongs — not duplicated on both sides).
+- Cinematic intro: `src/components/motion/CinematicIntro.tsx` — see "Cinematic intro" above. Three-beat GSAP timeline: arrival (scale+opacity, 0.45s) → hold (0.15s, a real position offset, not a same-property tween — see Changelog) → exit fade+slide together (~0.5–0.55s).
+- Video Editing showcase: `src/components/video-editing/VideoShowcase.tsx` — content-aware grid (see "Video Editing" above) with staggered GSAP scroll entrance. Replaces the old `VideoCarousel.tsx` (deleted, not renamed-and-kept — no rotation state left to degrade for 1/2-item categories, since a grid doesn't need it).
+- Graphic Design gallery: `GraphicDesignCard.tsx` uses the same `glass-subtle → glass-standard` hover treatment as the video showcase; `src/app/projects/graphic-design/page.tsx` staggers the cards in on scroll the same way (replacing a single whole-grid `Reveal` fade).
 - Lightboxes (`VideoLightbox`, `GraphicDesignLightbox`): GSAP entrance/exit (fade + slight scale), not a default modal pop. Both accept an optional `viewAllHref`/`viewAllLabel` pair, rendered only when passed, for non-category-page contexts (currently only Home's Featured Work preview).
-- Navbar: active-page underline on top-level links and the Projects dropdown trigger.
-- No 3D on the site. Evaluated and deliberately skipped — see Changelog below.
+- Navbar: active-page underline on top-level links and the Projects dropdown trigger; now a persistent `glass-standard` surface (see "Glass system" above).
+- **3D: kept.** `src/components/three/HeroScene.tsx` + `HeroSceneGate.tsx`, on Home's intro section only (`src/app/page.tsx`), desktop/tablet (`lg:` and up — gated in JS via `useSyncExternalStore` over `matchMedia`, not just CSS `hidden`, so the WebGL context is never created off-screen on mobile). A single faceted/low-poly icosahedron with a glass-like `meshPhysicalMaterial` (transmission + clearcoat), lit with two directional lights tinted per-theme, sitting in a `glass-strong` panel. Slow constant rotation plus an eased tilt toward the pointer (`@react-three/fiber`'s `state.pointer`, lerped — not a hard snap). `prefers-reduced-motion` freezes all motion via the same `useSyncExternalStore`-over-`matchMedia` pattern used everywhere else in the codebase, rendering a static form. Lazy-loaded via `next/dynamic({ ssr: false })`. Deliberately not a device/laptop/monitor mockup — evaluated against exactly that templated pattern and steered away from it. This reverses the 2026-08-30 "evaluated and skipped" decision below now that real visual verification (headless Chromium + screenshot inspection, including a scripted pointer-move test) is available — see Changelog.
 
 ## Changelog — 2026-08-30
 
@@ -203,3 +214,16 @@ Before calling a feature complete: test desktop, tablet, mobile; test Light and 
 - **Home Featured Work real content**: the Video Editing and Graphic Design cards preview real supplied work (the SaaS video, the Benetton poster) and open the existing lightbox for it, with a "See all …" link to the full category page, via a new opt-in `enableFeaturedPreview` prop on `ProjectCategoryGrid`. GHL/WordPress are unchanged (no real content yet). `/projects` overview is unchanged (still links straight to each category).
 - **Motion pass**: scroll-reveal added where missing (`/testimonials`, `/projects`, all four service pages, Contact's form/info columns), Navbar active-page indicator added, restrained route-change fade added. See "Motion & 3D system" above.
 - **3D**: evaluated for Home/About; skipped. The bar for it was explicitly visual ("must look premium, not a tech demo," confirmed frame rate) and this environment has no way to visually verify that — shipping it unverified risked exactly the outcome the brief warned against. Skipping is the brief's own sanctioned valid outcome under "less, but better."
+
+## Changelog — 2026-08-30 (rebuild)
+
+Full creative rebuild: glass promoted to a structural material, the video carousel replaced with a grid, the cinematic intro re-choreographed, and 3D revisited and kept. Visual verification throughout used the local `@playwright/test` Chromium directly (headless, no MCP) — a throwaway `scratch-*.js` script per check, deleted after use; `scratch-*.js` is now gitignored so a forgotten one never lands in a commit.
+
+- **Carousel → grid**: `VideoCarousel.tsx` (SMALL/LARGE/SMALL rotation, GSAP-tweened positions, wraparound/incoming-item machinery) deleted outright and replaced by `VideoShowcase.tsx`, a responsive CSS grid — see "Video Editing" and "Motion & 3D system" above. No rotation state to degrade for 1-/2-item categories anymore; a grid just renders however many tiles exist. Verified by real scrolling (not a full-page screenshot — see below) at 1 item (SaaS Videos), 2 items (Gaming), and a 4+2 partial-last-row case (Reels & Shorts, 6 items in a 4-column grid).
+- **Glass system**: promoted from a restrained accent to a first-class three-tier system — see "Glass system" above. Applied to the Navbar (now always-on, not just post-scroll), the mobile nav drawer, both showcase grids, and a new hero panel around the 3D element.
+- **Real bug caught mid-build — Lightning CSS silently drops `backdrop-filter`**: writing both `backdrop-filter: blur(Npx)` and a manual `-webkit-backdrop-filter: blur(Npx)` in the same custom `@utility` rule causes Tailwind v4's CSS transform (Lightning CSS) to deduplicate the pair down to *only* the prefixed declaration — the unprefixed `backdrop-filter` silently disappears from the compiled output. Screenshots alone never caught this (the blur's absence at these background opacities isn't visually obvious); it only surfaced by reading `getComputedStyle(...).backdropFilter` before/after a hover and seeing `"none"` in both states. Fix: write only the unprefixed property and let the build's own autoprefixing add the vendor-prefixed form — the same path Tailwind's built-in `backdrop-blur-*` utilities use. Lesson for future glass/blur work in this codebase: verify `backdrop-filter` with computed-style inspection, not just a screenshot diff.
+- **Real bug caught mid-build — GSAP timeline position anchor**: the cinematic intro's exit tweens were positioned at `"<"` relative to a same-property no-op "hold" tween, which anchors to that tween's *start*, not its *end* — the exit tweens started 0.15s early and silently overrode the hold every frame it should have shown. Fix: replaced the no-op hold tween with a real position offset (`"+=0.15"`) on the next real tween. Caught by measuring actual DOM attached→detached duration rather than trusting the coded numbers.
+- **Cinematic intro re-choreographed**: logo now arrives (scale 0.92→1 + fade in, `power2.out`) instead of being static from frame one; brief hold; exit is a synchronized fade+scale-down of the logo with the panel slide. Reduced-motion variant also updated to fade in before fading out, rather than only fading out.
+- **3D reinstated**: see "Motion & 3D system" above for the shipped implementation. Verified via headless screenshots in both themes, a scripted three-position pointer-move test (confirmed the tilt reads as a smooth, intentional response rather than jitter), and a `prefers-reduced-motion` context check (motion freezes, form still renders).
+- **New dependencies**: `three`, `@react-three/fiber`, `@react-three/drei` (drei installed for API consistency with the fiber ecosystem; not currently imported — `HeroScene.tsx` only needed fiber's primitives and a native `meshPhysicalMaterial`, not a drei helper).
+- Full QA re-run for this pass: `npm run build` (clean, all 10 routes static) and `npx eslint src` (clean) both pass; verified in both themes at 320/375/1440 with no horizontal overflow; keyboard interaction (tab to a showcase tile, Enter opens its lightbox, Escape closes) confirmed programmatically; console/page errors checked across Home, Video Editing, and Graphic Design and came back clean.

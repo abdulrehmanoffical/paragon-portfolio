@@ -86,3 +86,45 @@
     text-wrap: pretty;
   }
 }
+
+/* Paragon glass system — three tiers, built only from existing palette
+   tokens (--color-surface, --color-border) plus native blur/shadow. No new
+   colors: translucency and blur are the only "material" added. Registered
+   via `@utility` (Tailwind v4's custom-utility API), not a plain class in
+   `@layer utilities` — that's what makes `hover:glass-standard` and
+   `group-hover:glass-standard` resolve; a hand-written class only gets
+   picked up as-is, with no variant support.
+
+   Tier selection is a performance rule, not a taste rule: `-strong` and
+   `-standard` carry heavy blur (xl/2xl) and are reserved for surfaces that
+   exist in small numbers on screen at once (Navbar, a hero panel, lightbox
+   chrome, a floating CTA). A grid with many tiles on screen simultaneously
+   (showcase grids, the graphic design gallery) uses `-subtle` at rest and
+   steps up to `-standard` only on hover, so at most one or two heavy-blur
+   layers are ever active together. */
+/* No manual -webkit-backdrop-filter here: Lightning CSS (Tailwind v4's CSS
+   transform) deduplicates a hand-written standard+prefixed pair down to just
+   the prefixed one when both carry the same value, silently dropping the
+   unprefixed `backdrop-filter` — confirmed by inspecting the compiled output.
+   Writing only the standard property and letting the build's own
+   autoprefixing add the vendor-prefixed form (the same path Tailwind's
+   built-in `backdrop-blur-*` utilities use) is what actually ships both. */
+@utility glass-subtle {
+  background-color: color-mix(in srgb, var(--color-surface) 60%, transparent);
+  backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, var(--color-border) 40%, transparent);
+}
+
+@utility glass-standard {
+  background-color: color-mix(in srgb, var(--color-surface) 45%, transparent);
+  backdrop-filter: blur(24px);
+  border: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
+  box-shadow: 0 10px 30px -8px rgb(0 0 0 / 0.05);
+}
+
+@utility glass-strong {
+  background-color: color-mix(in srgb, var(--color-surface) 35%, transparent);
+  backdrop-filter: blur(40px);
+  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  box-shadow: 0 20px 45px -10px rgb(0 0 0 / 0.1);
+}

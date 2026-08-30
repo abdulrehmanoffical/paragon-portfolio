@@ -50,10 +50,8 @@ export default function Navbar() {
   return (
     <>
     <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-background/75 backdrop-blur-md py-4 border-b border-border/50 shadow-sm shadow-black/5"
-          : "bg-transparent py-5"
+      className={`fixed top-0 left-0 w-full z-50 glass-standard border-x-0! border-t-0! transition-all duration-300 ${
+        isScrolled ? "py-4" : "py-5"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
@@ -130,7 +128,7 @@ export default function Navbar() {
           ancestor creates a new containing block for position:fixed descendants,
           which previously collapsed this drawer to the header's own height) */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-x-0 top-[65px] bottom-0 bg-background border-t border-border z-40 overflow-y-auto px-6 py-8 flex flex-col justify-between">
+        <div className="md:hidden fixed inset-x-0 top-[65px] bottom-0 glass-subtle border-x-0! border-b-0! z-40 overflow-y-auto px-6 py-8 flex flex-col justify-between">
           <div className="space-y-6">
             <div className="flex flex-col space-y-4 text-sm uppercase tracking-[0.14em] font-medium text-text">
               <Link

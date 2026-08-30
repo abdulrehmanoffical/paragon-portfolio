@@ -17,8 +17,9 @@ export default function GraphicDesignCard({ project, onSelect }: GraphicDesignCa
   return (
     <button
       type="button"
+      data-gallery-card
       onClick={() => onSelect(project)}
-      className="group block w-full text-left rounded-2xl bg-surface border border-border p-3 sm:p-4 transition-all duration-300 hover:border-strong/40 hover:shadow-md hover:shadow-black/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-strong/30"
+      className="group block w-full text-left rounded-2xl glass-subtle hover:glass-standard focus-visible:glass-standard p-3 sm:p-4 transition-[background-color,backdrop-filter,box-shadow,border-color] duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-strong/30"
     >
       <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden mb-4 border border-border transition-transform duration-300 group-hover:scale-[1.01]">
         {cover ? (

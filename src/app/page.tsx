@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import CinematicIntro from "@/components/motion/CinematicIntro";
 // import TeamVideo from "@/components/ui/CinematicHeroVideo"; — restore alongside SECTION 1 below
 import HomeFeaturedWork from "@/components/portfolio/HomeFeaturedWork";
+import HeroSceneGate from "@/components/three/HeroSceneGate";
 import FinalCTA from "@/components/ui/FinalCTA";
 import Footer from "@/components/layout/Footer";
 import gsap from "gsap";
@@ -93,26 +94,36 @@ export default function Home() {
       */}
       <section
         ref={introSectionRef}
-        className="w-full pt-32 sm:pt-40 md:pt-44 pb-16 md:pb-24 px-4 sm:px-6 lg:px-8 border-b border-border"
+        className="w-full pt-32 sm:pt-40 md:pt-44 pb-16 md:pb-24 px-4 sm:px-6 lg:px-8 border-b border-border overflow-hidden"
       >
-        <div className="max-w-3xl mx-auto text-left">
-          {/* Compositional accent — a plain rule, not copy, giving the
-              headline a deliberate anchor rather than starting cold */}
-          <div className="w-12 h-px bg-border mb-6" aria-hidden="true" />
-          <h1
-            ref={headlineRef}
-            className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-strong leading-[1.15] mb-5 text-balance uppercase"
-          >
-            THREE MINDS.
-            <br />
-            ONE CREATIVE STANDARD.
-          </h1>
-          <p
-            ref={paragraphRef}
-            className="text-base sm:text-lg md:text-xl text-secondary font-normal leading-relaxed max-w-xl text-pretty"
-          >
-            We work across video, design, and digital to create work that is clear, purposeful, and built to perform.
-          </p>
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
+          <div className="text-left">
+            {/* Compositional accent — a plain rule, not copy, giving the
+                headline a deliberate anchor rather than starting cold */}
+            <div className="w-12 h-px bg-border mb-6" aria-hidden="true" />
+            <h1
+              ref={headlineRef}
+              className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-strong leading-[1.15] mb-5 text-balance uppercase"
+            >
+              THREE MINDS.
+              <br />
+              ONE CREATIVE STANDARD.
+            </h1>
+            <p
+              ref={paragraphRef}
+              className="text-base sm:text-lg md:text-xl text-secondary font-normal leading-relaxed max-w-xl text-pretty"
+            >
+              We work across video, design, and digital to create work that is clear, purposeful, and built to perform.
+            </p>
+          </div>
+
+          {/* Signature 3D moment — a single abstract, faceted glass form,
+              not a device mockup. Desktop/tablet only (see HeroSceneGate);
+              purely decorative, so it never competes with the text column
+              for attention or tab order. */}
+          <div className="hidden lg:block">
+            <HeroSceneGate />
+          </div>
         </div>
       </section>
 
