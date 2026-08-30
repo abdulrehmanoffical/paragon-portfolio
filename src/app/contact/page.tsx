@@ -3,6 +3,7 @@ import ContactHero from "@/components/contact/ContactHero";
 import ContactForm from "@/components/contact/ContactForm";
 import ContactInfo from "@/components/contact/ContactInfo";
 import Footer from "@/components/layout/Footer";
+import Reveal from "@/components/motion/Reveal";
 
 export const metadata: Metadata = {
   title: "Let's Talk | Paragon",
@@ -17,11 +18,15 @@ export default function ContactPage() {
       <section className="w-full flex-1 py-12 md:py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
           <div className="lg:col-span-7">
-            <ContactForm />
+            <Reveal>
+              <ContactForm />
+            </Reveal>
           </div>
 
           <div className="lg:col-span-5">
-            <ContactInfo />
+            <Reveal delay={0.12}>
+              <ContactInfo />
+            </Reveal>
           </div>
         </div>
       </section>

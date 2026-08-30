@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import ProjectCategoryGrid from "@/components/portfolio/ProjectCategoryGrid";
 import Footer from "@/components/layout/Footer";
+import Reveal from "@/components/motion/Reveal";
 
 export const metadata: Metadata = {
   title: "Projects | Paragon",
@@ -22,9 +23,11 @@ export default function ProjectsPage() {
       </header>
 
       <main className="w-full flex-1 py-12 md:py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <ProjectCategoryGrid />
-        </div>
+        <Reveal>
+          <div className="max-w-7xl mx-auto">
+            <ProjectCategoryGrid />
+          </div>
+        </Reveal>
       </main>
 
       <Footer />

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { SERVICES_INFO, ServiceType } from "@/lib/portfolioData";
 import { TESTIMONIALS } from "@/lib/testimonialsData";
 import Footer from "@/components/layout/Footer";
+import Reveal from "@/components/motion/Reveal";
 
 const FILTERS: { label: string; value: ServiceType | "all" }[] = [
   { label: "All", value: "all" },
@@ -51,22 +52,24 @@ export default function TestimonialsPage() {
       </header>
 
       <main className="w-full flex-1 py-12 md:py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {testimonials.map((t) => (
-            <div
-              key={t.id}
-              className="p-6 md:p-8 rounded-xl border border-border bg-surface flex flex-col justify-between"
-            >
-              <p className="font-display text-lg md:text-xl text-strong leading-snug mb-6">
-                &ldquo;{t.quote}&rdquo;
-              </p>
-              <div>
-                <span className="text-sm font-medium text-strong">{t.name}</span>
-                {t.role && <span className="text-sm text-secondary"> &mdash; {t.role}</span>}
+        <Reveal>
+          <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {testimonials.map((t) => (
+              <div
+                key={t.id}
+                className="p-6 md:p-8 rounded-xl border border-border bg-surface flex flex-col justify-between transition-all duration-300 hover:border-strong/30 hover:shadow-md hover:shadow-black/5"
+              >
+                <p className="font-display text-lg md:text-xl text-strong leading-snug mb-6">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+                <div>
+                  <span className="text-sm font-medium text-strong">{t.name}</span>
+                  {t.role && <span className="text-sm text-secondary"> &mdash; {t.role}</span>}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </Reveal>
       </main>
 
       <Footer />

@@ -56,10 +56,14 @@ export default function TestimonialSlider({
     };
   }, [index]);
 
+  // Auto-advance runs regardless of prefers-reduced-motion — that setting
+  // governs the crossfade *tween* above (which already swaps instantly
+  // without one when reduced motion is on), not whether the content itself
+  // keeps auto-updating. Killing the timer entirely here meant testimonials
+  // never auto-advanced on any reduced-motion system; pause-on-hover/focus
+  // (already implemented below) is the accessible way to stop it.
   useEffect(() => {
     if (isPaused || total <= 1) return;
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReducedMotion) return;
 
     timerRef.current = setInterval(() => {
       setIndex((i) => (i + 1) % total);

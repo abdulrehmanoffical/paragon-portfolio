@@ -38,6 +38,17 @@ export default function VideoCarousel({
 
   const total = items.length;
   const hasMultiple = total > 1;
+  // With exactly two items, prevIndex and nextIndex both wrap to the same
+  // *other* item — there is only one genuinely distinct neighbor, not two.
+  // Showing it in both side slots at once read as the same video duplicated
+  // left and right. Show it once, on the side it actually sits relative to
+  // the array (item 1 is "next" of item 0, so it belongs on the right while
+  // item 0 is centered; item 0 is "prev" of item 1, so it belongs on the
+  // left once item 1 is centered).
+  const isPair = total === 2;
+  const pairOtherOnRight = isPair && currentIndex === 0;
+  const showLeft = hasMultiple && (!isPair || !pairOtherOnRight);
+  const showRight = hasMultiple && (!isPair || pairOtherOnRight);
   const isVertical = aspectRatio === "9/16";
 
   // Helper indices for infinite rotating wrap-around
@@ -71,14 +82,20 @@ export default function VideoCarousel({
 
       // The item two steps out from center is what will fill the vacated
       // side slot once this rotation lands — flush it into the DOM now so
-      // its ref exists before the timeline below is built.
-      const incomingIndex =
-        direction === "next"
-          ? (currentIndex + 2) % total
-          : (currentIndex - 2 + total) % total;
-      flushSync(() => {
-        setIncoming({ direction, item: items[incomingIndex] });
-      });
+      // its ref exists before the timeline below is built. Skipped for
+      // pairs: "two steps out" from a 2-item list wraps back to the item
+      // already on screen, so there's no genuinely new item to bring in —
+      // the center↔side tweens below already land the single real
+      // neighbor in its correct slot on their own.
+      if (!isPair) {
+        const incomingIndex =
+          direction === "next"
+            ? (currentIndex + 2) % total
+            : (currentIndex - 2 + total) % total;
+        flushSync(() => {
+          setIncoming({ direction, item: items[incomingIndex] });
+        });
+      }
 
       // Context-safe animation
       const ctx = gsap.context(() => {
@@ -176,7 +193,7 @@ export default function VideoCarousel({
 
       return () => ctx.revert();
     },
-    [currentIndex, total, isAnimating, items]
+    [currentIndex, total, isAnimating, items, isPair]
   );
 
   // Swipe handling for mobile
@@ -257,8 +274,9 @@ export default function VideoCarousel({
                 containerRef's real, definite flex-1 width to resolve
                 against instead. */}
             <div className="relative flex items-center justify-center gap-3 sm:gap-6 md:gap-8 w-full">
-              {/* LEFT ITEM (Small side preview) */}
-              {hasMultiple && (
+              {/* LEFT ITEM (Small side preview) — hidden for a 2-item
+                  category when its one real neighbor belongs on the right */}
+              {showLeft && (
                 <div
                   ref={leftCardRef}
                   onClick={() => handleRotate("prev")}
@@ -297,8 +315,9 @@ export default function VideoCarousel({
                 </div>
               </div>
 
-              {/* RIGHT ITEM (Small side preview) */}
-              {hasMultiple && (
+              {/* RIGHT ITEM (Small side preview) — hidden for a 2-item
+                  category when its one real neighbor belongs on the left */}
+              {showRight && (
                 <div
                   ref={rightCardRef}
                   onClick={() => handleRotate("next")}

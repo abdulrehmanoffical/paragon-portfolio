@@ -4,6 +4,7 @@ import ExternalProjectCard from "@/components/portfolio/ExternalProjectCard";
 import EmptyServiceState from "@/components/portfolio/EmptyServiceState";
 import ServiceTestimonials from "@/components/testimonials/ServiceTestimonials";
 import Footer from "@/components/layout/Footer";
+import Reveal from "@/components/motion/Reveal";
 
 export const metadata: Metadata = {
   title: "WordPress | Paragon",
@@ -28,13 +29,15 @@ export default function WordPressPage() {
       </header>
 
       <main className="w-full flex-1 py-12 md:py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-          {projects.length > 0 ? (
-            projects.map((project) => <ExternalProjectCard key={project.id} project={project} />)
-          ) : (
-            <EmptyServiceState message={`New ${service.title} projects are on their way.`} />
-          )}
-        </div>
+        <Reveal>
+          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+            {projects.length > 0 ? (
+              projects.map((project) => <ExternalProjectCard key={project.id} project={project} />)
+            ) : (
+              <EmptyServiceState message={`New ${service.title} projects are on their way.`} />
+            )}
+          </div>
+        </Reveal>
       </main>
 
       <ServiceTestimonials service="wordpress" />

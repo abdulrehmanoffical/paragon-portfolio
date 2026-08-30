@@ -6,6 +6,7 @@ import VideoCarousel from "@/components/video-editing/VideoCarousel";
 import VideoLightbox from "@/components/video-editing/VideoLightbox";
 import ServiceTestimonials from "@/components/testimonials/ServiceTestimonials";
 import Footer from "@/components/layout/Footer";
+import Reveal from "@/components/motion/Reveal";
 
 export default function VideoEditingPortfolioPage() {
   const [selectedVideo, setSelectedVideo] = useState<VideoProject | null>(null);
@@ -18,14 +19,16 @@ export default function VideoEditingPortfolioPage() {
         ==================================================
       */}
       <header className="w-full pt-28 sm:pt-36 pb-8 md:pb-12 px-4 sm:px-6 lg:px-8 border-b border-border">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-strong uppercase mb-4">
-            VIDEO EDITING
-          </h1>
-          <p className="text-base sm:text-lg md:text-xl text-secondary font-normal max-w-2xl text-pretty">
-            Cinematic edits with clear pacing, strong visual flow, and attention to detail.
-          </p>
-        </div>
+        <Reveal>
+          <div className="max-w-7xl mx-auto">
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-strong uppercase mb-4">
+              VIDEO EDITING
+            </h1>
+            <p className="text-base sm:text-lg md:text-xl text-secondary font-normal max-w-2xl text-pretty">
+              Cinematic edits with clear pacing, strong visual flow, and attention to detail.
+            </p>
+          </div>
+        </Reveal>
       </header>
 
       {/*

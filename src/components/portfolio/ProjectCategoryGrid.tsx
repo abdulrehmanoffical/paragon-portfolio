@@ -1,8 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight, Play, Layers, BarChart3, Layout } from "lucide-react";
+import { VIDEO_CATEGORIES, VideoProject } from "@/lib/videoEditingData";
+import { Project, getProjectsByService } from "@/lib/portfolioData";
+import VideoLightbox from "@/components/video-editing/VideoLightbox";
+import GraphicDesignLightbox from "./GraphicDesignLightbox";
 
 interface FeaturedCategory {
   id: string;
@@ -183,33 +188,136 @@ const featuredCategories: FeaturedCategory[] = [
   },
 ];
 
-export default function ProjectCategoryGrid() {
+// The one real SaaS video and the Benetton poster — the only two pieces of
+// real content that currently exist for Featured Work. GHL/WordPress have
+// no real content yet, so they keep the abstract mockup + direct link
+// unconditionally; fabricating a "best work" thumbnail for them would be
+// exactly the invented content the content rules forbid.
+const featuredVideoProject: VideoProject | null =
+  VIDEO_CATEGORIES.find((c) => c.id === "saas-videos")?.items[0] ?? null;
+
+const graphicDesignProjects: Project[] = getProjectsByService("graphic-design");
+const featuredGraphicIndex = graphicDesignProjects.findIndex((p) => p.id === "des-benetton");
+const featuredGraphicProject: Project | null =
+  featuredGraphicIndex >= 0 ? graphicDesignProjects[featuredGraphicIndex] : null;
+
+interface ProjectCategoryGridProps {
+  /** When true (Home's Featured Work only — never the /projects overview
+   * page, which must keep linking straight to each category per CLAUDE.md):
+   * the Video Editing and Graphic Design cards preview real supplied work
+   * and open the existing lightbox for it, with a "See all …" link out to
+   * the full category page, instead of navigating away immediately. */
+  enableFeaturedPreview?: boolean;
+}
+
+export default function ProjectCategoryGrid({ enableFeaturedPreview = false }: ProjectCategoryGridProps) {
+  const [videoLightboxOpen, setVideoLightboxOpen] = useState(false);
+  const [graphicActiveIndex, setGraphicActiveIndex] = useState<number | null>(null);
+
+  const cardClassName =
+    "group block w-full text-left rounded-2xl bg-surface border border-border p-3 sm:p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-strong/40 hover:shadow-md hover:shadow-black/5";
+
+  const cardInner = (name: string, visual: React.ReactNode) => (
+    <>
+      {/* Dominant Visual Thumbnail */}
+      <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden mb-4 border border-border bg-ink transition-transform duration-300 group-hover:scale-[1.01]">
+        {visual}
+      </div>
+
+      {/* Bottom Row: Service Name & Arrow (glass badge — the one deliberate
+          glass touch in this grid, per the brief's "small floating UI
+          elements" good-use case) */}
+      <div className="flex items-center justify-between px-1 py-1">
+        <span className="text-base sm:text-lg font-medium text-text group-hover:text-strong transition-colors">
+          {name}
+        </span>
+        <div className="w-8 h-8 rounded-full bg-surface/70 backdrop-blur-md border border-border/50 flex items-center justify-center text-text group-hover:bg-strong group-hover:text-background group-hover:border-strong transition-all duration-300">
+          <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-7 lg:gap-10">
-      {featuredCategories.map((category) => (
-        <Link
-          key={category.id}
-          href={category.href}
-          className="group block rounded-2xl bg-surface border border-border p-3 sm:p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-strong/40 hover:shadow-md hover:shadow-black/5"
-        >
-          {/* Dominant Visual Thumbnail */}
-          <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden mb-4 border border-border bg-ink transition-transform duration-300 group-hover:scale-[1.01]">
-            {category.renderVisual()}
-          </div>
+      {featuredCategories.map((category) => {
+        if (enableFeaturedPreview && category.id === "video-editing" && featuredVideoProject?.poster) {
+          return (
+            <button
+              key={category.id}
+              type="button"
+              onClick={() => setVideoLightboxOpen(true)}
+              className={cardClassName}
+            >
+              {cardInner(
+                category.name,
+                <>
+                  <Image
+                    src={featuredVideoProject.poster}
+                    alt=""
+                    fill
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/50 via-transparent to-transparent" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-14 h-14 rounded-full bg-paper/15 border border-paper/30 backdrop-blur-sm flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-300">
+                      <Play className="w-5 h-5 text-paper fill-paper/40 translate-x-0.5" />
+                    </div>
+                  </div>
+                </>
+              )}
+            </button>
+          );
+        }
 
-          {/* Bottom Row: Service Name & Arrow (glass badge — the one deliberate
-              glass touch in this grid, per the brief's "small floating UI
-              elements" good-use case) */}
-          <div className="flex items-center justify-between px-1 py-1">
-            <span className="text-base sm:text-lg font-medium text-text group-hover:text-strong transition-colors">
-              {category.name}
-            </span>
-            <div className="w-8 h-8 rounded-full bg-surface/70 backdrop-blur-md border border-border/50 flex items-center justify-center text-text group-hover:bg-strong group-hover:text-background group-hover:border-strong transition-all duration-300">
-              <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </div>
-          </div>
-        </Link>
-      ))}
+        if (enableFeaturedPreview && category.id === "graphic-design" && featuredGraphicProject?.gallery?.[0]) {
+          return (
+            <button
+              key={category.id}
+              type="button"
+              onClick={() => setGraphicActiveIndex(featuredGraphicIndex)}
+              className={cardClassName}
+            >
+              {cardInner(
+                category.name,
+                <Image
+                  src={featuredGraphicProject.gallery[0]}
+                  alt=""
+                  fill
+                  sizes="(min-width: 768px) 50vw, 100vw"
+                  className="object-cover"
+                />
+              )}
+            </button>
+          );
+        }
+
+        return (
+          <Link key={category.id} href={category.href} className={cardClassName}>
+            {cardInner(category.name, category.renderVisual())}
+          </Link>
+        );
+      })}
+
+      {enableFeaturedPreview && (
+        <>
+          <VideoLightbox
+            project={videoLightboxOpen ? featuredVideoProject : null}
+            onClose={() => setVideoLightboxOpen(false)}
+            viewAllHref="/projects/video-editing"
+            viewAllLabel="See all Video Editing"
+          />
+          <GraphicDesignLightbox
+            projects={graphicDesignProjects}
+            activeIndex={graphicActiveIndex}
+            onClose={() => setGraphicActiveIndex(null)}
+            onNavigate={setGraphicActiveIndex}
+            viewAllHref="/projects/graphic-design"
+            viewAllLabel="See all Graphic Design"
+          />
+        </>
+      )}
     </div>
   );
 }

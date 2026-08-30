@@ -7,6 +7,7 @@ import GraphicDesignLightbox from "@/components/portfolio/GraphicDesignLightbox"
 import EmptyServiceState from "@/components/portfolio/EmptyServiceState";
 import ServiceTestimonials from "@/components/testimonials/ServiceTestimonials";
 import Footer from "@/components/layout/Footer";
+import Reveal from "@/components/motion/Reveal";
 
 export default function GraphicDesignPage() {
   const service = SERVICES_INFO["graphic-design"];
@@ -27,19 +28,21 @@ export default function GraphicDesignPage() {
       </header>
 
       <main className="w-full flex-1 py-12 md:py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {projects.length > 0 ? (
-            projects.map((project, index) => (
-              <GraphicDesignCard
-                key={project.id}
-                project={project}
-                onSelect={() => setActiveIndex(index)}
-              />
-            ))
-          ) : (
-            <EmptyServiceState message="New graphic design work is on its way." />
-          )}
-        </div>
+        <Reveal>
+          <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {projects.length > 0 ? (
+              projects.map((project, index) => (
+                <GraphicDesignCard
+                  key={project.id}
+                  project={project}
+                  onSelect={() => setActiveIndex(index)}
+                />
+              ))
+            ) : (
+              <EmptyServiceState message="New graphic design work is on its way." />
+            )}
+          </div>
+        </Reveal>
       </main>
 
       <GraphicDesignLightbox

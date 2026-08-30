@@ -2,15 +2,26 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import ProjectsDropdown from "./PortfolioDropdown";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import Logo from "@/components/ui/Logo";
 import { ArrowUpRight, Menu, X, ChevronRight } from "lucide-react";
 
+const NAV_LINKS = [
+  { name: "HOME", href: "/" },
+  { name: "ABOUT", href: "/about" },
+  { name: "TESTIMONIALS", href: "/testimonials" },
+  { name: "CONTACT", href: "/contact" },
+];
+
 export default function Navbar() {
+  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileProjectsOpen, setMobileProjectsOpen] = useState(false);
+
+  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   useEffect(() => {
     const handleScroll = () => {
@@ -54,32 +65,39 @@ export default function Navbar() {
         </div>
 
         {/* Center: Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8 text-xs uppercase tracking-[0.14em] font-medium text-text">
+        <nav className="hidden md:flex items-center space-x-8 text-xs uppercase tracking-[0.14em] font-medium">
           <Link
             href="/"
-            className="hover:text-strong transition-colors py-2 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-strong/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className={`relative py-2 transition-colors rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-strong/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+              isActive("/") ? "text-strong" : "text-text hover:text-strong"
+            }`}
           >
             HOME
+            <span
+              className={`absolute left-0 -bottom-0.5 h-px bg-strong transition-all duration-300 ${
+                isActive("/") ? "w-full" : "w-0"
+              }`}
+              aria-hidden="true"
+            />
           </Link>
           <ProjectsDropdown />
-          <Link
-            href="/about"
-            className="hover:text-strong transition-colors py-2 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-strong/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-          >
-            ABOUT
-          </Link>
-          <Link
-            href="/testimonials"
-            className="hover:text-strong transition-colors py-2 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-strong/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-          >
-            TESTIMONIALS
-          </Link>
-          <Link
-            href="/contact"
-            className="hover:text-strong transition-colors py-2 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-strong/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-          >
-            CONTACT
-          </Link>
+          {NAV_LINKS.slice(1).map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`relative py-2 transition-colors rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-strong/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                isActive(link.href) ? "text-strong" : "text-text hover:text-strong"
+              }`}
+            >
+              {link.name}
+              <span
+                className={`absolute left-0 -bottom-0.5 h-px bg-strong transition-all duration-300 ${
+                  isActive(link.href) ? "w-full" : "w-0"
+                }`}
+                aria-hidden="true"
+              />
+            </Link>
+          ))}
         </nav>
 
         {/* Right: Theme Toggle, CTA & Mobile Toggle */}

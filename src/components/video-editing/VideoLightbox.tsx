@@ -1,17 +1,25 @@
 "use client";
 
 import React, { useEffect, useCallback, useRef } from "react";
+import Link from "next/link";
 import gsap from "gsap";
-import { X, Play } from "lucide-react";
+import { X, Play, ArrowUpRight } from "lucide-react";
 import { VideoProject } from "@/lib/videoEditingData";
 import { EASE, DURATION } from "@/lib/motion";
 
 interface VideoLightboxProps {
   project: VideoProject | null;
   onClose: () => void;
+  /** Only set when opened from a context that isn't already the full
+   * category page (e.g. Home's Featured Work) — renders a "See all …" link
+   * to that page. Omitted everywhere else so normal in-page use of this
+   * lightbox (the actual Video Editing page) doesn't gain a redundant button
+   * linking to itself. */
+  viewAllHref?: string;
+  viewAllLabel?: string;
 }
 
-export default function VideoLightbox({ project, onClose }: VideoLightboxProps) {
+export default function VideoLightbox({ project, onClose, viewAllHref, viewAllLabel }: VideoLightboxProps) {
   const backdropRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const closingRef = useRef(false);
@@ -145,6 +153,18 @@ export default function VideoLightbox({ project, onClose }: VideoLightboxProps) 
             </div>
           )}
         </div>
+
+        {viewAllHref && (
+          <div className="flex items-center justify-end px-5 py-3.5 border-t border-border/50 bg-surface/70 backdrop-blur-md">
+            <Link
+              href={viewAllHref}
+              className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-medium text-strong hover:text-secondary transition-colors group"
+            >
+              <span>{viewAllLabel ?? "See all"}</span>
+              <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

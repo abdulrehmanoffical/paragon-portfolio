@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import gsap from "gsap";
-import { X, ZoomIn, ZoomOut, Maximize2, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ZoomIn, ZoomOut, Maximize2, ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import { Project } from "@/lib/portfolioData";
 import ProjectThumbnail from "./ProjectThumbnail";
 import { EASE, DURATION } from "@/lib/motion";
@@ -13,6 +14,12 @@ interface GraphicDesignLightboxProps {
   activeIndex: number | null;
   onClose: () => void;
   onNavigate: (index: number) => void;
+  /** Only set when opened from a context that isn't already the full
+   * category page (e.g. Home's Featured Work) — renders a "See all …" link
+   * to that page. Omitted everywhere else (the actual Graphic Design page)
+   * so it doesn't gain a redundant button linking to itself. */
+  viewAllHref?: string;
+  viewAllLabel?: string;
 }
 
 const MIN_SCALE = 1;
@@ -23,6 +30,8 @@ export default function GraphicDesignLightbox({
   activeIndex,
   onClose,
   onNavigate,
+  viewAllHref,
+  viewAllLabel,
 }: GraphicDesignLightboxProps) {
   const [scale, setScale] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -367,6 +376,21 @@ export default function GraphicDesignLightbox({
           </div>
         )}
       </div>
+
+      {viewAllHref && (
+        <div
+          className="shrink-0 flex items-center justify-end px-4 sm:px-6 py-3.5 border-t border-paper/10"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Link
+            href={viewAllHref}
+            className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-medium text-paper hover:text-paper/70 transition-colors group"
+          >
+            <span>{viewAllLabel ?? "See all"}</span>
+            <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

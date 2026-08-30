@@ -181,3 +181,25 @@ Use the actual skill commands/names available in the current environment. Do not
 ## QA
 
 Before calling a feature complete: test desktop, tablet, mobile; test Light and Dark mode; test keyboard and touch interactions; check browser console, hydration, TypeScript, routes, media, animations, accessibility. Run `npm run build` and `npx eslint src`.
+
+## Motion & 3D system
+
+- Shared easing/duration tokens: `src/lib/motion.ts` (`EASE`, `DURATION`) — used by the carousel, both lightboxes, the testimonial crossfade, the theme toggle.
+- Shared scroll-reveal: `src/components/motion/Reveal.tsx` — wraps a block, fades/slides it up on scroll (`top 85%` trigger), self-registers ScrollTrigger, skips the tween under `prefers-reduced-motion`. Used on every page's main content area except Home and About, which already have their own per-section reveals.
+- Route-level fade: `src/components/motion/RouteTransition.tsx`, wrapping `{children}` in `src/app/layout.tsx` — a soft entrance for the incoming page on navigation instead of a hard cut. Not a true old/new crossfade (that needs the View Transitions API); skips on first paint and under reduced motion.
+- Cinematic intro: `src/components/motion/CinematicIntro.tsx` — see "Cinematic intro" above, unchanged.
+- Video Editing carousel: `src/components/video-editing/VideoCarousel.tsx` — physical SMALL/LARGE/SMALL rotation via GSAP. Degrades for a 1-item category (no arrows/side previews) and a 2-item category (shows the one real neighbor once, on the side it belongs — not duplicated on both sides).
+- Lightboxes (`VideoLightbox`, `GraphicDesignLightbox`): GSAP entrance/exit (fade + slight scale), not a default modal pop. Both accept an optional `viewAllHref`/`viewAllLabel` pair, rendered only when passed, for non-category-page contexts (currently only Home's Featured Work preview).
+- Navbar: active-page underline on top-level links and the Projects dropdown trigger.
+- No 3D on the site. Evaluated and deliberately skipped — see Changelog below.
+
+## Changelog — 2026-08-30
+
+- **Dark mode fix**: color tokens were declared inside `@theme inline`, which bakes literal hex values into generated utilities instead of `var()` references — the `[data-theme="dark"]` override had nothing to attach to, so only the logo/theme-toggle (a separate `dark:`-variant mechanism) ever visibly switched. Moved the six color tokens to a plain `@theme` block; font tokens stay `inline` (they need to reference next/font's scoped variables).
+- **Carousel collapse fix**: the SMALL/LARGE/SMALL row was `w-fit`, but its children are sized with percentage widths, which only resolve against a *definite* containing-block width — a shrink-to-fit row has none, so cards collapsed to near-zero. Changed to `w-full`.
+- **Carousel duplicate-preview fix**: a category with exactly two items showed the same "other" video in both side slots (prev/next both wrap to the same item when total is 2). Now shows it once, on the side it actually sits.
+- **Favicon cache-busting**: added `?v=2` to the favicon URLs.
+- **Testimonial autoplay fix**: `prefers-reduced-motion` was killing the auto-advance `setInterval` entirely, not just the crossfade tween — testimonials never auto-advanced for anyone with that OS/browser setting. The reduced-motion check now only governs the crossfade animation; auto-advance always runs, pause-on-hover/focus remains the accessible way to stop it.
+- **Home Featured Work real content**: the Video Editing and Graphic Design cards preview real supplied work (the SaaS video, the Benetton poster) and open the existing lightbox for it, with a "See all …" link to the full category page, via a new opt-in `enableFeaturedPreview` prop on `ProjectCategoryGrid`. GHL/WordPress are unchanged (no real content yet). `/projects` overview is unchanged (still links straight to each category).
+- **Motion pass**: scroll-reveal added where missing (`/testimonials`, `/projects`, all four service pages, Contact's form/info columns), Navbar active-page indicator added, restrained route-change fade added. See "Motion & 3D system" above.
+- **3D**: evaluated for Home/About; skipped. The bar for it was explicitly visual ("must look premium, not a tech demo," confirmed frame rate) and this environment has no way to visually verify that — shipping it unverified risked exactly the outcome the brief warned against. Skipping is the brief's own sanctioned valid outcome under "less, but better."

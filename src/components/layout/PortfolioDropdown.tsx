@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ChevronDown, ArrowUpRight } from "lucide-react";
 
 const projectItems = [
@@ -12,6 +13,8 @@ const projectItems = [
 ];
 
 export default function ProjectsDropdown() {
+  const pathname = usePathname();
+  const isActive = pathname.startsWith("/projects");
   const [isOpen, setIsOpen] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -40,7 +43,9 @@ export default function ProjectsDropdown() {
     >
       <Link
         href="/projects"
-        className="flex items-center gap-1 py-2 text-xs uppercase tracking-[0.14em] font-medium text-text hover:text-strong transition-colors rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-strong/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className={`relative flex items-center gap-1 py-2 text-xs uppercase tracking-[0.14em] font-medium transition-colors rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-strong/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+          isActive ? "text-strong" : "text-text hover:text-strong"
+        }`}
         onClick={() => setIsOpen(false)}
       >
         <span>PROJECTS</span>
@@ -48,6 +53,12 @@ export default function ProjectsDropdown() {
           className={`w-3.5 h-3.5 text-secondary transition-transform duration-200 ${
             isOpen ? "rotate-180 text-strong" : ""
           }`}
+        />
+        <span
+          className={`absolute left-0 -bottom-0.5 h-px bg-strong transition-all duration-300 ${
+            isActive ? "w-full" : "w-0"
+          }`}
+          aria-hidden="true"
         />
       </Link>
 

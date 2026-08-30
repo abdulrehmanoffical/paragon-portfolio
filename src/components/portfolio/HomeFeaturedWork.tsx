@@ -45,7 +45,7 @@ export default function HomeFeaturedWork() {
           </h2>
         </div>
 
-        <ProjectCategoryGrid />
+        <ProjectCategoryGrid enableFeaturedPreview />
       </div>
     </section>
   );
